@@ -1,8 +1,15 @@
 const youtubedl = require('youtube-dl-exec');
 const path = require('path');
+const fs = require('fs');
+const ffmpegPath = require('ffmpeg-static'); // Imports the portable FFmpeg
+
+// 1. Fix the ENOENT error by ensuring the folder always exists
+const targetFolder = './music';
+if (!fs.existsSync(targetFolder)) {
+    fs.mkdirSync(targetFolder, { recursive: true });
+}
 
 async function downloadMp3(url) {
-    const targetFolder = './music';
     const outputPath = path.join(targetFolder, '%(title)s.%(ext)s');
     console.log(`Downloading and converting: ${url}`);
 
@@ -12,7 +19,8 @@ async function downloadMp3(url) {
             audioFormat: 'mp3',
             audioQuality: '192K',
             output: outputPath,
-            noWarnings: true
+            noWarnings: true,
+            ffmpegLocation: ffmpegPath // 2. Tell yt-dlp where to find FFmpeg
         });
         console.log(`Download complete! Saved to ${targetFolder}`);
     } catch (error) {
@@ -21,8 +29,8 @@ async function downloadMp3(url) {
 }
 
 async function downloadSongs(songs) {
-    const targetFolder = './music';
     const outputPath = path.join(targetFolder, '%(title)s.%(ext)s');
+    
     // Start background downloads
     for (const searchQuery of songs) {
         console.log(`Downloading: ${searchQuery}`);
@@ -32,7 +40,8 @@ async function downloadSongs(songs) {
                 audioFormat: 'mp3',
                 audioQuality: '192K',
                 output: outputPath,
-                noWarnings: true
+                noWarnings: true,
+                ffmpegLocation: ffmpegPath // 2. Tell yt-dlp where to find FFmpeg
             });
             console.log(`Finished: ${searchQuery}`);
         } catch (error) {
@@ -42,4 +51,4 @@ async function downloadSongs(songs) {
     console.log('All CSV downloads complete!');
 }
 
-module.exports = { downloadMp3, downloadSongs};
+module.exports = { downloadMp3, downloadSongs };

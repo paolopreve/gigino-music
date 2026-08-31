@@ -7,6 +7,10 @@ const fs = require('fs');
 const app = express();
 const PORT = 3000;
 
+if (!fs.existsSync('./music')) {
+    fs.mkdirSync('./music');
+}
+
 // Serve static frontend files from the 'public' directory
 app.use(express.json());
 app.use(express.static('public'));
