@@ -1,4 +1,5 @@
 const express = require('express');
+const { downloadMp3 } = require('./downloader');
 const app = express();
 const PORT = 3000;
 
@@ -9,6 +10,21 @@ app.use(express.static('public'));
 // Create a backend API route
 app.get('/api/message', (req, res) => {
     res.json({ text: "Hello from the Node.js backend!" });
+});
+
+app.post('/api/download', async (req, res) => {
+    const videoUrl = req.body.url;
+    if (!videoUrl) {
+        return res.status(400).json({ error: 'Please provide a YouTube URL' });
+    }
+    try {
+        await downloadMp3(videoUrl);
+        
+        res.status(200).json({ message: 'Download successful!' });
+    } catch (error) {
+        console.error('Error during download:', error);
+        res.status(500).json({ error: 'Failed to download the video' });
+    }
 });
 
 // Start the server
