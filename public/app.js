@@ -49,3 +49,39 @@ document.getElementById('downloadBtn').addEventListener('click', async () => {
         console.error("Error:", error);
     }
 });
+
+document.getElementById('uploadBtn').addEventListener('click', async () => {
+    const fileInput = document.getElementById('musicFileInput');
+    const displayElement = document.getElementById('displayMessage3');
+
+    if (fileInput.files.length === 0) {
+        displayElement.innerText = "Please select a file first.";
+        return;
+    }
+
+    const file = fileInput.files[0];
+    displayElement.innerText = `Uploading ${file.name}...`;
+
+    // 1. Bundle the file into FormData
+    const formData = new FormData();
+    formData.append('musicFile', file); // 'musicFile' is the key the server will look for
+
+    try {
+        // 2. Send the POST request (do NOT set Content-Type manually, the browser handles it for FormData)
+        const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            displayElement.innerText = "Success: " + result.message;
+        } else {
+            displayElement.innerText = "Error: " + result.error;
+        }
+    } catch (error) {
+        console.error("Upload error:", error);
+        displayElement.innerText = "Error connecting to the server!";
+    }
+});

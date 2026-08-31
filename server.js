@@ -1,5 +1,6 @@
 const express = require('express');
 const { downloadMp3 } = require('./downloader');
+const { upload } = require('./uploader.js');
 const app = express();
 const PORT = 3000;
 
@@ -25,6 +26,14 @@ app.post('/api/download', async (req, res) => {
         console.error('Error during download:', error);
         res.status(500).json({ error: 'Failed to download the video' });
     }
+});
+
+app.post('/api/upload', upload.single('musicFile'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file received' });
+    }
+    
+    res.status(200).json({ message: `Saved as ${req.file.filename}` });
 });
 
 // Start the server
