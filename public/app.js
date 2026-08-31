@@ -146,3 +146,36 @@ document.getElementById('uploadBtn').addEventListener('click', async () => {
         displayElement.innerText = "Error connecting to the server!";
     }
 });
+
+document.getElementById('downloadCsvBtn').addEventListener('click', async () => {
+    const fileInput = document.getElementById('csvFileInput');
+    const displayElement = document.getElementById('displayMessage4');
+
+    if (fileInput.files.length === 0) {
+        displayElement.innerText = "Please select a CSV file first.";
+        return;
+    }
+
+    displayElement.innerText = `Uploading and processing ${fileInput.files[0].name}...`;
+
+    const formData = new FormData();
+    formData.append('csvFile', fileInput.files[0]);
+
+    try {
+        const response = await fetch('/api/process-csv', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            displayElement.innerText = "Success: " + result.message;
+        } else {
+            displayElement.innerText = "Error: " + result.error;
+        }
+    } catch (error) {
+        console.error("Upload error:", error);
+        displayElement.innerText = "Error connecting to the server!";
+    }
+});

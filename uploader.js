@@ -1,6 +1,8 @@
 const multer = require('multer');
 const fs = require('fs');
 
+const uploadCsvToMemory = multer({ storage: multer.memoryStorage() });
+
 const uploadDir = './music';
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir);
@@ -28,4 +30,4 @@ const upload = multer({
     limits: { fileSize: 50 * 1024 * 1024 } // Optional: limit to 50MB
 });
 
-module.exports = { upload };
+module.exports = { upload, uploadCsvToMemory };
