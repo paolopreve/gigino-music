@@ -1,84 +1,9 @@
-// This runs automatically as soon as the page loads
-document.addEventListener('DOMContentLoaded', async () => {
-    const songListElement = document.getElementById('songList');
-    
-    try {
-        // Fetch the list of songs from your new API
-        const response = await fetch('/api/songs');
-        const data = await response.json();
-        
-        if (response.ok) {
-            // Clear any loading text
-            songListElement.innerHTML = '';
-            
-            // If the folder is empty
-            if (data.songs.length === 0) {
-                songListElement.innerHTML = '<li>No songs found.</li>';
-                return;
-            }
-
-            // Loop through the array and create an <li> for each song
-            data.songs.forEach(song => {
-                const li = document.createElement('li');
-                li.textContent = song;
-                songListElement.appendChild(li);
-            });
-        } else {
-            songListElement.innerHTML = `<li>Error: ${data.error}</li>`;
-        }
-    } catch (error) {
-        console.error("Failed to load songs:", error);
-        songListElement.innerHTML = '<li>Error connecting to server.</li>';
-    }
-});
-
-document.addEventListener('DOMContentLoaded', async () => {
-    const songListElement = document.getElementById('songList');
-    const musicPlayer = document.getElementById('musicPlayer'); // Get the player
-    
-    try {
-        const response = await fetch('/api/songs');
-        const data = await response.json();
-        
-        if (response.ok) {
-            songListElement.innerHTML = '';
-            
-            if (data.songs.length === 0) {
-                songListElement.innerHTML = '<li>No songs found.</li>';
-                return;
-            }
-
-            data.songs.forEach(song => {
-                const li = document.createElement('li');
-                li.textContent = song;
-                
-                // Make it look clickable
-                li.style.cursor = 'pointer';
-                li.style.padding = '5px 0';
-                
-                // Add click logic to play the song
-                li.addEventListener('click', () => {
-                    // Point the player to the static route we created in server.js
-                    // encodeURIComponent handles spaces and special characters in the filename safely
-                    musicPlayer.src = `/media/${encodeURIComponent(song)}`;
-                    musicPlayer.play(); // Auto-start the song
-                });
-
-                songListElement.appendChild(li);
-            });
-        } else {
-            songListElement.innerHTML = `<li>Error: ${data.error}</li>`;
-        }
-    } catch (error) {
-        console.error("Failed to load songs:", error);
-        songListElement.innerHTML = '<li>Error connecting to server.</li>';
-    }
-});
+//musiceditor.js 
 
 document.getElementById('downloadBtn').addEventListener('click', async () => {
     // 1. Grab the URL from your input field and the display element
     const urlValue = document.getElementById('urlInput').value.trim();
-    const displayElement = document.getElementById('displayMessage2');
+    const displayElement = document.getElementById('displayMessage');
     
     if (!urlValue) {
         displayElement.innerText = "Please enter a valid YouTube URL.";
@@ -113,7 +38,7 @@ document.getElementById('downloadBtn').addEventListener('click', async () => {
 
 document.getElementById('uploadBtn').addEventListener('click', async () => {
     const fileInput = document.getElementById('musicFileInput');
-    const displayElement = document.getElementById('displayMessage3');
+    const displayElement = document.getElementById('displayMessage2');
 
     if (fileInput.files.length === 0) {
         displayElement.innerText = "Please select a file first.";
@@ -149,7 +74,7 @@ document.getElementById('uploadBtn').addEventListener('click', async () => {
 
 document.getElementById('downloadCsvBtn').addEventListener('click', async () => {
     const fileInput = document.getElementById('csvFileInput');
-    const displayElement = document.getElementById('displayMessage4');
+    const displayElement = document.getElementById('displayMessage3');
 
     if (fileInput.files.length === 0) {
         displayElement.innerText = "Please select a CSV file first.";

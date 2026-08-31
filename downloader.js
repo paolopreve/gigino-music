@@ -42,5 +42,4 @@ async function downloadSongs(songs) {
     console.log('All CSV downloads complete!');
 }
 
-module.exports = { downloadMp3 };
-module.exports = { downloadSongs };
+module.exports = { downloadMp3, downloadSongs};
