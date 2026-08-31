@@ -32,19 +32,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 });
 
-document.getElementById('fetchDataBtn').addEventListener('click', async () => {
-    const displayElement = document.getElementById('displayMessage');
+document.addEventListener('DOMContentLoaded', async () => {
+    const songListElement = document.getElementById('songList');
+    const musicPlayer = document.getElementById('musicPlayer'); // Get the player
     
     try {
-        // Fetch data from the backend API
-        const response = await fetch('/api/message');
+        const response = await fetch('/api/songs');
         const data = await response.json();
         
-        // Display the data on the page
-        displayElement.innerText = data.text;
+        if (response.ok) {
+            songListElement.innerHTML = '';
+            
+            if (data.songs.length === 0) {
+                songListElement.innerHTML = '<li>No songs found.</li>';
+                return;
+            }
+
+            data.songs.forEach(song => {
+                const li = document.createElement('li');
+                li.textContent = song;
+                
+                // Make it look clickable
+                li.style.cursor = 'pointer';
+                li.style.padding = '5px 0';
+                
+                // Add click logic to play the song
+                li.addEventListener('click', () => {
+                    // Point the player to the static route we created in server.js
+                    // encodeURIComponent handles spaces and special characters in the filename safely
+                    musicPlayer.src = `/media/${encodeURIComponent(song)}`;
+                    musicPlayer.play(); // Auto-start the song
+                });
+
+                songListElement.appendChild(li);
+            });
+        } else {
+            songListElement.innerHTML = `<li>Error: ${data.error}</li>`;
+        }
     } catch (error) {
-        displayElement.innerText = "Error fetching data!";
-        console.error("Error:", error);
+        console.error("Failed to load songs:", error);
+        songListElement.innerHTML = '<li>Error connecting to server.</li>';
     }
 });
 

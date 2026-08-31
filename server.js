@@ -8,11 +8,7 @@ const PORT = 3000;
 // Serve static frontend files from the 'public' directory
 app.use(express.json());
 app.use(express.static('public'));
-
-// Create a backend API route
-app.get('/api/message', (req, res) => {
-    res.json({ text: "Hello from the Node.js backend!" });
-});
+app.use('/media', express.static('music'));
 
 app.get('/api/songs', (req, res) => {
     const folderPath = './music'; // Change to './downloads' if that's where your songs are

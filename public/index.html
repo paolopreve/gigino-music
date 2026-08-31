@@ -10,11 +10,6 @@
 
 <body>
     <div class="container">
-        <h1>My Full-Stack App</h1>
-        <button id="fetchDataBtn">Get Backend Message</button>
-        <p id="displayMessage">Waiting for data...</p>
-    </div>
-    <div class="container">
         <textarea id="urlInput"></textarea>
         <button id="downloadBtn">Download music video</button>
         <p id="displayMessage2">Ready to download :)</p>
@@ -26,6 +21,10 @@
         <p id="displayMessage3"></p>
     </div>
     <div class="container">
+        <h3>Music Player</h3>
+        <audio id="musicPlayer" controls style="width: 100%; max-width: 400px; margin-bottom: 20px;">
+            Your browser does not support the audio element.
+        </audio>
         <h3>My Music Library</h3>
         <!-- The UL where we will inject the song names -->
         <ul id="songList"></ul>
