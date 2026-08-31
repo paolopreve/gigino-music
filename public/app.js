@@ -1,3 +1,37 @@
+// This runs automatically as soon as the page loads
+document.addEventListener('DOMContentLoaded', async () => {
+    const songListElement = document.getElementById('songList');
+    
+    try {
+        // Fetch the list of songs from your new API
+        const response = await fetch('/api/songs');
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Clear any loading text
+            songListElement.innerHTML = '';
+            
+            // If the folder is empty
+            if (data.songs.length === 0) {
+                songListElement.innerHTML = '<li>No songs found.</li>';
+                return;
+            }
+
+            // Loop through the array and create an <li> for each song
+            data.songs.forEach(song => {
+                const li = document.createElement('li');
+                li.textContent = song;
+                songListElement.appendChild(li);
+            });
+        } else {
+            songListElement.innerHTML = `<li>Error: ${data.error}</li>`;
+        }
+    } catch (error) {
+        console.error("Failed to load songs:", error);
+        songListElement.innerHTML = '<li>Error connecting to server.</li>';
+    }
+});
+
 document.getElementById('fetchDataBtn').addEventListener('click', async () => {
     const displayElement = document.getElementById('displayMessage');
     

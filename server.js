@@ -1,6 +1,7 @@
 const express = require('express');
 const { downloadMp3 } = require('./downloader');
 const { upload } = require('./uploader.js');
+const fs = require('fs');
 const app = express();
 const PORT = 3000;
 
@@ -11,6 +12,24 @@ app.use(express.static('public'));
 // Create a backend API route
 app.get('/api/message', (req, res) => {
     res.json({ text: "Hello from the Node.js backend!" });
+});
+
+app.get('/api/songs', (req, res) => {
+    const folderPath = './music'; // Change to './downloads' if that's where your songs are
+
+    // Read the contents of the folder
+    fs.readdir(folderPath, (err, files) => {
+        if (err) {
+            console.error("Error reading directory:", err);
+            return res.status(500).json({ error: 'Failed to load songs' });
+        }
+
+        // Optional: Filter out hidden files or non-mp3s
+        const songs = files.filter(file => file.endsWith('.mp3'));
+
+        // Send the list of filenames to the frontend
+        res.status(200).json({ songs: songs });
+    });
 });
 
 app.post('/api/download', async (req, res) => {
