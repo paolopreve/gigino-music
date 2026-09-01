@@ -81,6 +81,8 @@ app.post('/api/upload', upload.single('musicFile'), (req, res) => {
 });
 
 // Start the server
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+// Start the server (Accessible locally and via USB tethering)
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server is running locally on http://localhost:${PORT}`);
+    console.log(`To access from your phone, find your laptop's IPv4 address and add :${PORT}`);
 });

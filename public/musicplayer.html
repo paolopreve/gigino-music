@@ -1,24 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gigino-music</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gigino-music Player</title>
+    
+    <!-- Ionic Core CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+    
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-    <div class="container">
-        <h3>Music Player</h3>
-        <audio id="musicPlayer" controls style="width: 100%; max-width: 400px; margin-bottom: 20px;">
-            Your browser does not support the audio element.
-        </audio>
-        <h3>My Music Library</h3>
-        <!-- The UL where we will inject the song names -->
-        <ul id="songList"></ul>
-    </div>
+    <ion-app>
+        <!-- Sticky Header with a Native Back Button -->
+        <ion-header>
+            <ion-toolbar color="primary">
+                <ion-buttons slot="start">
+                    <ion-button href="/index.html">Back</ion-button>
+                </ion-buttons>
+                <ion-title>Now Playing</ion-title>
+            </ion-toolbar>
+        </ion-header>
+
+        <ion-content class="ion-padding">
+            <!-- Audio Player Section -->
+            <div style="display: flex; justify-content: center; margin-top: 20px; margin-bottom: 20px;">
+                <audio id="musicPlayer" controls style="width: 100%; max-width: 400px; border-radius: 10px;">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+
+            <!-- Library Section -->
+            <ion-list-header>
+                <ion-label>My Music Library</ion-label>
+            </ion-list-header>
+            
+            <!-- Kept as a standard <ul> so your musicplayer.js does not break -->
+            <ul id="songList" style="list-style: none; padding-left: 0; margin-top: 10px;"></ul>
+            
+        </ion-content>
+    </ion-app>
+
     <script src="musicplayer.js"></script>
 </body>
-
 </html>

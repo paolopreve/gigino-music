@@ -1,23 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gigino-music</title>
+    
+    <!-- Ionic Core CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+    
+    <!-- Ionic JavaScript Web Components -->
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+    
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-    <div class="container">
-        <button id="musicEditorBtn">Upload/Download songs</button>
-    </div>
+    <!-- ion-app wraps your entire application -->
+    <ion-app>
+        
+        <!-- Native mobile header -->
+        <ion-header>
+            <ion-toolbar color="primary">
+                <ion-title>Gigino-Music</ion-title>
+            </ion-toolbar>
+        </ion-header>
 
-    <div class="container">
-        <button id="musicPlayerBtn">Check downloaded songs</button>
-    </div>
-    
+        <!-- Scrollable content area with mobile padding -->
+        <ion-content class="ion-padding">
+            
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+                <!-- expand="block" makes the button fill the screen width like a standard mobile app -->
+                <ion-button id="musicEditorBtn" expand="block" size="large">
+                    Upload / Download Songs
+                </ion-button>
+
+                <ion-button id="musicPlayerBtn" expand="block" size="large" color="secondary">
+                    Check Downloaded Songs
+                </ion-button>
+            </div>
+
+        </ion-content>
+
+    </ion-app>
+
+    <!-- Your existing JS file works perfectly with Ionic buttons -->
     <script src="index.js"></script>
 </body>
-
 </html>

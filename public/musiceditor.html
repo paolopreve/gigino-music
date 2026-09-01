@@ -1,32 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gigino-music</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Gigino-music Editor</title>
+    
+    <!-- Ionic Core CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+    
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-    <div class="container">
-        <textarea id="urlInput"></textarea>
-        <button id="downloadBtn">Download music video</button>
-        <p id="displayMessage">Ready to download :)</p>
-    </div>
+    <ion-app>
+        <!-- Sticky Header with a Native Back Button -->
+        <ion-header>
+            <ion-toolbar color="primary">
+                <ion-buttons slot="start">
+                    <ion-button href="/index.html">Back</ion-button>
+                </ion-buttons>
+                <ion-title>Music Editor</ion-title>
+            </ion-toolbar>
+        </ion-header>
 
-    <div class="container">
-        <input type="file" id="musicFileInput" accept=".mp3">
-        <button id="uploadBtn">Upload Music</button>
-        <p id="displayMessage2"></p>
-    </div>
+        <ion-content class="ion-padding">
+            
+            <!-- Section 1: YouTube URL Download -->
+            <ion-card>
+                <ion-card-header>
+                    <ion-card-title>Download from URL</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                    <!-- Kept as a standard textarea so your JS .value logic doesn't break -->
+                    <textarea id="urlInput" placeholder="Paste YouTube link here..." style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+                    
+                    <ion-button id="downloadBtn" expand="block">Download music video</ion-button>
+                    <p id="displayMessage" style="text-align: center; margin-top: 10px;">Ready to download :)</p>
+                </ion-card-content>
+            </ion-card>
 
-    <div class="container">
-        <input type="file" id="csvFileInput" accept=".csv">
-        <button id="downloadCsvBtn">Download songs from csv</button>
-        <p id="displayMessage3"></p>
-    </div>
+            <!-- Section 2: Individual MP3 Upload -->
+            <ion-card>
+                <ion-card-header>
+                    <ion-card-title>Upload Local Music</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                    <!-- Kept as standard HTML file inputs so your JS formData logic doesn't break -->
+                    <input type="file" id="musicFileInput" accept=".mp3" style="width: 100%; margin-bottom: 15px;">
+                    
+                    <ion-button id="uploadBtn" expand="block" color="secondary">Upload Music</ion-button>
+                    <p id="displayMessage2" style="text-align: center; margin-top: 10px;"></p>
+                </ion-card-content>
+            </ion-card>
+
+            <!-- Section 3: Batch CSV Download -->
+            <ion-card>
+                <ion-card-header>
+                    <ion-card-title>Batch Download (CSV)</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                    <input type="file" id="csvFileInput" accept=".csv" style="width: 100%; margin-bottom: 15px;">
+                    
+                    <ion-button id="downloadCsvBtn" expand="block" color="tertiary">Download songs from csv</ion-button>
+                    <p id="displayMessage3" style="text-align: center; margin-top: 10px;"></p>
+                </ion-card-content>
+            </ion-card>
+
+        </ion-content>
+    </ion-app>
+
     <script src="musiceditor.js"></script>
 </body>
-
 </html>
