@@ -4,6 +4,7 @@ const { downloadMp3, downloadSongs } = require('./downloader');
 const { upload, uploadCsvToMemory } = require('./uploader.js');
 const csv = require('csv-parser');
 const fs = require('fs');
+const { getPlaylistSongs } = require('./spotify.js');
 const app = express();
 const PORT = 3000;
 
@@ -69,6 +70,25 @@ app.post('/api/download', async (req, res) => {
     } catch (error) {
         console.error('Error during download:', error);
         res.status(500).json({ error: 'Failed to download the video' });
+    }
+});
+
+app.post('/api/downloadSpotify', async (req, res) => {
+    const spotifyUrl = req.body.url;
+    if (!spotifyUrl) {
+        return res.status(400).json({ error: 'Please provide a Spotify playlist link' });
+    }
+    try {
+        const songs = await getPlaylistSongs(spotifyUrl);
+        if (!songs || songs.length === 0) {
+            return res.status(400).json({ error: 'Please provide a public Spotify playlist link' });
+        }
+        await downloadSongs(songs);
+
+        res.status(200).json({ message: 'Download successful!' });
+    } catch (error) {
+        console.error('Error during download:', error);
+        res.status(500).json({ error: 'Failed to download the playlist' });
     }
 });
 

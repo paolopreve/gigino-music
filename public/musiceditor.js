@@ -104,3 +104,39 @@ document.getElementById('downloadCsvBtn').addEventListener('click', async () => 
         displayElement.innerText = "Error connecting to the server!";
     }
 });
+
+document.getElementById('downloadSpotifyBtn').addEventListener('click', async () => {
+    // 1. Grab the URL from your input field and the display element
+    const urlValue = document.getElementById('spotifyUrlInput').value.trim();
+    const displayElement = document.getElementById('displayMessage4');
+    
+    if (!urlValue) {
+        displayElement.innerText = "Please enter a valid spotify playlist";
+        return;
+    }
+    
+    displayElement.innerText = "Downloading... please wait.";
+    
+    try {
+        // 2. Change to a POST request and send the URL in the body
+        const response = await fetch('/api/downloadSpotify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ url: urlValue }) // Send the payload
+        });
+        
+        const data = await response.json();
+        
+        // 3. Handle success or failure based on the server response
+        if (response.ok) {
+            displayElement.innerText = "Success: " + data.message;
+        } else {
+            displayElement.innerText = "Error: " + data.error;
+        }
+    } catch (error) {
+        displayElement.innerText = "Error connecting to the server!";
+        console.error("Error:", error);
+    }
+});

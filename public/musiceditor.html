@@ -67,6 +67,20 @@
                 </ion-card-content>
             </ion-card>
 
+            <!-- Section 4: Spotify playlist URL Download -->
+            <ion-card>
+                <ion-card-header>
+                    <ion-card-title>Download your public spotify playlist</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                    <!-- Kept as a standard textarea so your JS .value logic doesn't break -->
+                    <textarea id="spotifyUrlInput" placeholder="Paste spotify playlist link here..." style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+                    
+                    <ion-button id="downloadSpotifyBtn" expand="block">Download spotify playlist</ion-button>
+                    <p id="displayMessage4" style="text-align: center; margin-top: 10px;">Ready to download :)</p>
+                </ion-card-content>
+            </ion-card>
+
         </ion-content>
     </ion-app>
 
