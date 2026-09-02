@@ -4,7 +4,14 @@
 const playerBtn = document.getElementById('musicPlayerBtn');
 if (playerBtn) {
     playerBtn.addEventListener('click', () => {
-        window.location.href = '/musicplayer.html';
+        // Automatically grabs whatever IP or "localhost" you are currently using
+        const currentHost = window.location.hostname;
+
+        // Build the Jellyfin URL using port 8096
+        const jellyfinUrl = `http://${currentHost}:8096`;
+
+        // Redirect the browser
+        window.location.href = jellyfinUrl;
     });
 }
 

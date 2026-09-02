@@ -1,0 +1,21 @@
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    ports:
+      - "8096:8096"
+    volumes:
+      - ./jellyfin-config:/config
+      - ./music:/media/music
+    restart: unless-stopped
+
+  webapp:
+    build: .
+    container_name: gigino-music-app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./music:/app/music
+    env_file:
+      - .env
+    restart: unless-stopped

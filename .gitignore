@@ -1,3 +1,15 @@
+# Dependencies
+node_modules/
+
+# Environment variables
 .env
-/music
-/node_modules
+
+# Downloaded music / media
+music/
+
+# Jellyfin local container configuration data
+jellyfin-config/
+
+# OS-specific temporary files
+.DS_Store
+Thumbs.db

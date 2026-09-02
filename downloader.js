@@ -4,7 +4,7 @@ const fs = require('fs');
 const ffmpegPath = require('ffmpeg-static'); // Imports the portable FFmpeg
 
 // 1. Fix the ENOENT error by ensuring the folder always exists
-const targetFolder = './music';
+const targetFolder = '/app/music';
 if (!fs.existsSync(targetFolder)) {
     fs.mkdirSync(targetFolder, { recursive: true });
 }
