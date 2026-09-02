@@ -47,7 +47,7 @@ app.post('/api/process-csv', uploadCsvToMemory.single('csvFile'), (req, res) => 
         .pipe(csv())
         .on('data', (row) => {
             if (row['Track Name'] && row['Artist Name(s)']) {
-                songs.push(`${row['Track Name']} ${row['Artist Name(s)']} lyrics`);
+                songs.push(`${row['Track Name']} - ${row['Artist Name(s)']} lyrics`);
             }
         })
         .on('end', async () => {

@@ -11,7 +11,8 @@ if (playerBtn) {
         const jellyfinUrl = `http://${currentHost}:8096`;
 
         // Redirect the browser
-        window.location.href = jellyfinUrl;
+        //
+        window.open(jellyfinUrl, "_blank");
     });
 }
 

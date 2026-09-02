@@ -1,92 +1,118 @@
 const youtubedl = require('youtube-dl-exec');
 const path = require('path');
 const fs = require('fs');
-const ffmpegPath = require('ffmpeg-static'); // Imports the portable FFmpeg
+const ffmpegPath = require('ffmpeg-static');
+const NodeID3 = require('node-id3'); // 1. Import the tagger
 
-// 1. Fix the ENOENT error by ensuring the folder always exists
 const targetFolder = '/app/music';
 if (!fs.existsSync(targetFolder)) {
     fs.mkdirSync(targetFolder, { recursive: true });
 }
 
+function cleanSongTitle(rawTitle) {
+    let title = rawTitle
+        .replace(/\s*[\[\(\{].*?(lyrics?|official|video|audio|remaster(ed)?|hd|hq|4k|visualizer).*?[\]\)\}]/gi, '')
+        .replace(/\s*[-|/]\s*(official|video|audio|lyrics?|music video)\b.*/gi, '')
+        .replace(/\b(lyrics?|official|audio|video)\b/gi, '')
+        .replace(/[\\:*?"<>|]/g, '') // Keep hyphens for the tagger to read!
+        .replace(/\s+/g, ' ')
+        .trim();
+        
+    return title || 'Unknown_Song';
+}
+
 function isSongAlreadyDownloaded(searchQuery) {
-    if (!fs.existsSync(targetFolder)) {
-        return false;
-    }
+    if (!fs.existsSync(targetFolder)) return false;
 
     const files = fs.readdirSync(targetFolder);
-
-    // 1. Clean the query and filter out noise words like "lyrics", "official", "video"
     const cleanQuery = searchQuery.toLowerCase()
         .replace(/lyrics|audio|official|video|hd|hq|ft|feat/g, '')
         .replace(/[^a-z0-9]/g, ' ');
 
-    // Turn the remaining words into an array of keywords (ignoring tiny words <= 2 chars)
     const queryKeywords = cleanQuery.split(/\s+/).filter(word => word.length > 2);
-
     if (queryKeywords.length === 0) return false;
 
     for (const file of files) {
-        const fileNameWithoutExt = path.parse(file).name.toLowerCase();
-        const cleanFileName = fileNameWithoutExt.replace(/[^a-z0-9]/g, ' ');
-
-        // 2. Count how many keywords from our search query exist in this file name
+        const cleanFileName = path.parse(file).name.toLowerCase().replace(/[^a-z0-9]/g, ' ');
         let matchCount = 0;
         for (const keyword of queryKeywords) {
-            if (cleanFileName.includes(keyword)) {
-                matchCount++;
-            }
+            if (cleanFileName.includes(keyword)) matchCount++;
         }
-
-        // 3. If 70% or more of the keywords match, consider it already downloaded
-        const matchRatio = matchCount / queryKeywords.length;
-        if (matchRatio >= 0.7) {
-            return true;
-        }
+        if (matchCount / queryKeywords.length >= 0.7) return true;
     }
-
     return false;
 }
 
-async function downloadMp3(url) {
-    const outputPath = path.join(targetFolder, '%(title)s.%(ext)s');
-    console.log(`Downloading and converting: ${url}`);
+// 2. Helper function to write internal MP3 tags
+function injectTags(finalName, outputPath) {
+    const parts = finalName.split('-');
+    let tags = {};
+    
+    // If the name has a hyphen (Artist - Song), split it into proper tags
+    if (parts.length >= 2) {
+        tags.artist = parts[0].trim();
+        tags.title = parts.slice(1).join('-').trim();
+    } else {
+        tags.title = finalName.trim();
+    }
+    
+    // Force the metadata directly into the file
+    NodeID3.write(tags, outputPath);
+    console.log(`Injected ID3 Tags -> Artist: "${tags.artist || 'Unknown'}", Title: "${tags.title}"`);
+}
 
+async function downloadMp3(url) {
     try {
+        const info = await youtubedl(url, { dumpSingleJson: true, noWarnings: true });
+        const finalName = cleanSongTitle(info.title);
+
+        if (isSongAlreadyDownloaded(finalName)) {
+            console.log(`Skipped (already exists): ${finalName}`);
+            return;
+        }
+
+        const outputPath = path.join(targetFolder, `${finalName}.%(ext)s`);
+        const finalFilePath = path.join(targetFolder, `${finalName}.mp3`); // Exact path for ID3
+
         await youtubedl(url, {
             extractAudio: true,
             audioFormat: 'mp3',
             audioQuality: '192K',
             output: outputPath,
             noWarnings: true,
-            ffmpegLocation: ffmpegPath // 2. Tell yt-dlp where to find FFmpeg
+            ffmpegLocation: ffmpegPath
         });
-        console.log(`Download complete! Saved to ${targetFolder}`);
+        
+        injectTags(finalName, finalFilePath); // Inject tags here
+        console.log(`Download complete! Saved as ${finalName}.mp3`);
     } catch (error) {
         console.error('An error occurred:', error);
     }
 }
 
 async function downloadSongs(songs) {
-    const outputPath = path.join(targetFolder, '%(title)s.%(ext)s');
-
-    // Start background downloads
     for (const searchQuery of songs) {
         if (isSongAlreadyDownloaded(searchQuery)) {
             console.log(`Skipped (already exists): ${searchQuery}`);
-            continue; // Skip to the next iteration of the loop
+            continue; 
         }
-        console.log(`Downloading: ${searchQuery}`);
+        
+        const finalName = cleanSongTitle(searchQuery);
+        const outputPath = path.join(targetFolder, `${finalName}.%(ext)s`);
+        const finalFilePath = path.join(targetFolder, `${finalName}.mp3`);
+
         try {
             await youtubedl(`ytsearch1:${searchQuery}`, {
                 extractAudio: true,
                 audioFormat: 'mp3',
                 audioQuality: '192K',
-                output: outputPath,
+                output: outputPath, 
                 noWarnings: true,
-                ffmpegLocation: ffmpegPath // 2. Tell yt-dlp where to find FFmpeg
+                ffmpegLocation: ffmpegPath 
             });
-            console.log(`Finished: ${searchQuery}`);
+            
+            injectTags(finalName, finalFilePath); // Inject tags here
+            console.log(`Finished: ${finalName}`);
         } catch (error) {
             console.error(`Failed to download ${searchQuery}`);
         }

@@ -16,7 +16,7 @@ async function getPlaylistSongs(playlistUrl) {
                 ? track.artists[0].name
                 : (track.artist || "Unknown Artist"); // Fallback check
 
-            return `${trackName} ${artistName} lyrics`;
+            return `${artistName} - ${trackName} lyrics`;
         });
         console.log(songs.length);
         return songs;

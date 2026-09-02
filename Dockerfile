@@ -1,4 +1,4 @@
-FROM node:20-bullseye-slim
+FROM node:20-bookworm-slim
 
 # Install FFmpeg and Python (often required by yt-dlp for audio extraction)
 RUN apt-get update && \
