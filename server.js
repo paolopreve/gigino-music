@@ -47,7 +47,10 @@ app.post('/api/process-csv', uploadCsvToMemory.single('csvFile'), (req, res) => 
         .pipe(csv())
         .on('data', (row) => {
             if (row['Track Name'] && row['Artist Name(s)']) {
-                songs.push(`${row['Track Name']} - ${row['Artist Name(s)']} lyrics`);
+                // Split the CSV artist cell by commas and keep the first one
+                const mainArtist = row['Artist Name(s)'].split(/,|&|\bfeat\b/i)[0].trim();
+
+                songs.push(`${mainArtist} - ${row['Track Name']} lyrics`);
             }
         })
         .on('end', async () => {

@@ -11,12 +11,15 @@ async function getPlaylistSongs(playlistUrl) {
         const songs = tracks.map(track => {
             const trackName = track.name || "Unknown Track";
 
-            // Safely check if artists exist and have at least one entry
-            const artistName = (track.artists && track.artists.length > 0 && track.artists[0].name)
+            // Get the raw artist string
+            const rawArtist = (track.artists && track.artists.length > 0 && track.artists[0].name)
                 ? track.artists[0].name
-                : (track.artist || "Unknown Artist"); // Fallback check
+                : (track.artist || "Unknown Artist"); 
 
-            return `${artistName} - ${trackName} lyrics`;
+            // Split by comma, '&', or 'feat' and keep only the first part
+            const mainArtist = rawArtist.split(/,|&|\bfeat\b/i)[0].trim();
+
+            return `${mainArtist} - ${trackName} lyrics`;
         });
         console.log(songs.length);
         return songs;

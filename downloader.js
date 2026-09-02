@@ -43,16 +43,19 @@ function isSongAlreadyDownloaded(searchQuery) {
     return false;
 }
 
-// 2. Helper function to write internal MP3 tags
 function injectTags(finalName, outputPath) {
-    const parts = finalName.split('-');
     let tags = {};
     
-    // If the name has a hyphen (Artist - Song), split it into proper tags
-    if (parts.length >= 2) {
-        tags.artist = parts[0].trim();
-        tags.title = parts.slice(1).join('-').trim();
+    // Find the first instance of a hyphen surrounded by spaces
+    const splitIndex = finalName.indexOf(' - ');
+    
+    if (splitIndex !== -1) {
+        // Everything before the " - " is the Artist
+        tags.artist = finalName.substring(0, splitIndex).trim();
+        // Everything after the " - " is the Title
+        tags.title = finalName.substring(splitIndex + 3).trim();
     } else {
+        // Fallback if no separator is found
         tags.title = finalName.trim();
     }
     
