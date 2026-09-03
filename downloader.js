@@ -24,44 +24,40 @@ function cleanSongTitle(rawTitle) {
 function isSongAlreadyDownloaded(searchQuery) {
     if (!fs.existsSync(targetFolder)) return false;
 
+    // Predict the exact file name your app will generate
+    const expectedName = cleanSongTitle(searchQuery).toLowerCase();
+    
+    // Read the folder contents
     const files = fs.readdirSync(targetFolder);
-    const cleanQuery = searchQuery.toLowerCase()
-        .replace(/lyrics|audio|official|video|hd|hq|ft|feat/g, '')
-        .replace(/[^a-z0-9]/g, ' ');
-
-    const queryKeywords = cleanQuery.split(/\s+/).filter(word => word.length > 2);
-    if (queryKeywords.length === 0) return false;
-
+    
+    // Check if the exact filename exists (case-insensitive)
     for (const file of files) {
-        const cleanFileName = path.parse(file).name.toLowerCase().replace(/[^a-z0-9]/g, ' ');
-        let matchCount = 0;
-        for (const keyword of queryKeywords) {
-            if (cleanFileName.includes(keyword)) matchCount++;
+        if (file.toLowerCase() === `${expectedName}.mp3`) {
+            return true; 
         }
-        if (matchCount / queryKeywords.length >= 0.7) return true;
     }
+    
     return false;
 }
-
-function injectTags(finalName, outputPath) {
+// Add playlistName as the third parameter
+function injectTags(finalName, outputPath, playlistName) {
     let tags = {};
-    
-    // Find the first instance of a hyphen surrounded by spaces
     const splitIndex = finalName.indexOf(' - ');
     
     if (splitIndex !== -1) {
-        // Everything before the " - " is the Artist
         tags.artist = finalName.substring(0, splitIndex).trim();
-        // Everything after the " - " is the Title
         tags.title = finalName.substring(splitIndex + 3).trim();
     } else {
-        // Fallback if no separator is found
         tags.title = finalName.trim();
+        tags.artist = "Unknown Artist"; // Good fallback for YouTube Music
     }
     
-    // Force the metadata directly into the file
+    // TRICK YOUTUBE MUSIC: Force the Album tag to be the Playlist Name!
+    // If it's a single song, default to "Gigino Downloads"
+    tags.album = playlistName ? playlistName : "Gigino Downloads";
+    
     NodeID3.write(tags, outputPath);
-    console.log(`Injected ID3 Tags -> Artist: "${tags.artist || 'Unknown'}", Title: "${tags.title}"`);
+    console.log(`Injected Tags -> Artist: "${tags.artist}", Album: "${tags.album}", Title: "${tags.title}"`);
 }
 
 async function downloadMp3(url) {
@@ -92,6 +88,7 @@ async function downloadMp3(url) {
         console.error('An error occurred:', error);
     }
 }
+
 async function downloadSongs(songs, playlistName = null) {
     const playlistFiles = []; // Track files for the M3U
 
@@ -119,7 +116,7 @@ async function downloadSongs(songs, playlistName = null) {
                 ffmpegLocation: ffmpegPath 
             });
             
-            injectTags(finalName, finalFilePath);
+            injectTags(finalName, finalFilePath, playlistName);
             playlistFiles.push(fileName); // Add to playlist after successful download
             console.log(`Finished: ${finalName}`);
         } catch (error) {

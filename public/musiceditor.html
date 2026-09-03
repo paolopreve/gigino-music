@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gigino-music Editor</title>
-    
+
     <!-- Ionic Core CSS & JS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
     <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
     <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
-    
+
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <ion-app>
         <!-- Sticky Header with a Native Back Button -->
@@ -25,7 +27,7 @@
         </ion-header>
 
         <ion-content class="ion-padding">
-            
+
             <!-- Section 1: YouTube URL Download -->
             <ion-card>
                 <ion-card-header>
@@ -33,8 +35,9 @@
                 </ion-card-header>
                 <ion-card-content>
                     <!-- Kept as a standard textarea so your JS .value logic doesn't break -->
-                    <textarea id="urlInput" placeholder="Paste YouTube link here..." style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
-                    
+                    <textarea id="urlInput" placeholder="Paste YouTube link here..."
+                        style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+
                     <ion-button id="downloadBtn" expand="block">Download music video</ion-button>
                     <p id="displayMessage" style="text-align: center; margin-top: 10px;">Ready to download :)</p>
                 </ion-card-content>
@@ -48,7 +51,7 @@
                 <ion-card-content>
                     <!-- Kept as standard HTML file inputs so your JS formData logic doesn't break -->
                     <input type="file" id="musicFileInput" accept=".mp3" style="width: 100%; margin-bottom: 15px;">
-                    
+
                     <ion-button id="uploadBtn" expand="block" color="secondary">Upload Music</ion-button>
                     <p id="displayMessage2" style="text-align: center; margin-top: 10px;"></p>
                 </ion-card-content>
@@ -61,7 +64,7 @@
                 </ion-card-header>
                 <ion-card-content>
                     <input type="file" id="csvFileInput" accept=".csv" style="width: 100%; margin-bottom: 15px;">
-                    
+
                     <ion-button id="downloadCsvBtn" expand="block" color="tertiary">Download songs from csv</ion-button>
                     <p id="displayMessage3" style="text-align: center; margin-top: 10px;"></p>
                 </ion-card-content>
@@ -74,10 +77,29 @@
                 </ion-card-header>
                 <ion-card-content>
                     <!-- Kept as a standard textarea so your JS .value logic doesn't break -->
-                    <textarea id="spotifyUrlInput" placeholder="Paste spotify playlist link here..." style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
-                    
+                    <textarea id="spotifyUrlInput" placeholder="Paste spotify playlist link here..."
+                        style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px;"></textarea>
+
                     <ion-button id="downloadSpotifyBtn" expand="block">Download spotify playlist</ion-button>
                     <p id="displayMessage4" style="text-align: center; margin-top: 10px;">Ready to download :)</p>
+                </ion-card-content>
+            </ion-card>
+
+            <ion-card>
+                <ion-card-header>
+                    <ion-card-title>Download a Saved Playlist</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                    <!-- The ion-item wrapper ensures the select styling aligns properly -->
+                    <ion-item style="margin-bottom: 15px;">
+                        <ion-select id="playlistDropdown" placeholder="-- Select a Playlist --" interface="popover"
+                            style="width: 100%;">
+                            <!-- Options injected via JavaScript -->
+                        </ion-select>
+                    </ion-item>
+
+                    <ion-button id="downloadZipBtn" expand="block">Download to Device</ion-button>
+                    <p id="displayMessage5" style="text-align: center; margin-top: 10px;">Ready to download :)</p>
                 </ion-card-content>
             </ion-card>
 
@@ -86,4 +108,5 @@
 
     <script src="musiceditor.js"></script>
 </body>
+
 </html>

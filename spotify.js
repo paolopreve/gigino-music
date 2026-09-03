@@ -1,5 +1,5 @@
 const fetch = require('isomorphic-unfetch');
-const { getTracks } = require('spotify-url-info')(fetch);
+const { getTracks, getData } = require('spotify-url-info')(fetch);
 
 async function getPlaylistSongs(playlistUrl) {
     try {

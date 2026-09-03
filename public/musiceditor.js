@@ -1,5 +1,95 @@
 //musiceditor.js 
 
+document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Fixed the ID to match your HTML
+    const dropdown = document.getElementById('playlistDropdown'); 
+    dropdown.innerHTML = ''; // Clear any existing options
+
+    try {
+        const response = await fetch('/api/playlists');
+        const data = await response.json(); // Data is now an object, not an array
+
+        // 2. Handle the Empty State using ion-select-option
+        if (data.playlists.length === 0 && !data.hasSongs) {
+            const option = document.createElement('ion-select-option');
+            option.value = "";
+            option.textContent = data.message;
+            option.disabled = true;
+            dropdown.appendChild(option);
+            return;
+        }
+
+        // 4. Loop through the playlists array inside the data object
+        data.playlists.forEach(playlistName => {
+            // Must use ion-select-option for Ionic framework
+            const option = document.createElement('ion-select-option'); 
+            option.value = playlistName;
+            option.textContent = playlistName;
+            dropdown.appendChild(option);
+        });
+
+                // 3. Add the "All Songs" option if music exists
+        if (data.hasSongs) {
+            const allOption = document.createElement('ion-select-option');
+            allOption.value = "ALL_SONGS_DOWNLOAD";
+            allOption.textContent = "⭐ All Downloaded Songs";
+            dropdown.appendChild(allOption);
+        }
+    } catch (error) {
+        console.error("Could not load playlists:", error);
+        dropdown.innerHTML = '<ion-select-option value="">Error loading playlists</ion-select-option>';
+    }
+});
+
+document.getElementById('downloadZipBtn').addEventListener('click', async () => {
+    const dropdown = document.getElementById('playlistDropdown');
+    // Ensure you have an element to display statuses, like <p id="displayMessage"></p>
+    const displayElement = document.getElementById('displayMessage5'); 
+    const selectedPlaylist = dropdown.value;
+    
+    if (!selectedPlaylist) {
+        if (displayElement) displayElement.innerText = "Please select a playlist from the dropdown first.";
+        else alert("Please select a playlist from the dropdown first.");
+        return;
+    }
+
+    if (displayElement) displayElement.innerText = "Zipping playlist... please wait.";
+    
+    try {
+        // Fetch the ZIP file from your existing playlist route
+        const response = await fetch(`/api/download-existing-playlist?name=${encodeURIComponent(selectedPlaylist)}`);
+        
+        if (response.ok) {
+            // Read the response as a binary blob
+            const blob = await response.blob(); 
+            
+            // Create a temporary object URL for the browser
+            const downloadUrl = window.URL.createObjectURL(blob); 
+            
+            // Generate a hidden anchor tag to trigger the browser's download prompt
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            // Clean the filename using the same regex to match the backend
+            a.download = `${selectedPlaylist.replace(/[\\/:*?"<>|]/g, '').trim()}.zip`; 
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            
+            // Clear the memory after the download starts
+            window.URL.revokeObjectURL(downloadUrl);
+            
+            if (displayElement) displayElement.innerText = "Success: Playlist downloaded to your device!";
+            dropdown.value = ''; // Reset the dropdown
+        } else {
+            const errorText = await response.text();
+            if (displayElement) displayElement.innerText = "Error: " + errorText;
+        }
+    } catch (error) {
+        if (displayElement) displayElement.innerText = "Error connecting to the server!";
+        console.error("Error:", error);
+    }
+});
+
 document.getElementById('downloadBtn').addEventListener('click', async () => {
     // 1. Grab the URL from your input field and the display element
     const urlValue = document.getElementById('urlInput').value.trim();
