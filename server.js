@@ -82,16 +82,64 @@ app.post('/api/downloadSpotify', async (req, res) => {
         return res.status(400).json({ error: 'Please provide a Spotify playlist link' });
     }
     try {
-        const songs = await getPlaylistSongs(spotifyUrl);
+        const { playlistTitle, songs } = await getPlaylistSongs(spotifyUrl);
         if (!songs || songs.length === 0) {
             return res.status(400).json({ error: 'Please provide a public Spotify playlist link' });
         }
-        await downloadSongs(songs);
+
+        res.status(200).json({ message: `Started downloading ${songs.length} songs from ${playlistTitle}!` });
+        // Pass the title to generate the .m3u file
+        await downloadSongs(songs, playlistTitle);
 
         res.status(200).json({ message: 'Download successful!' });
     } catch (error) {
         console.error('Error during download:', error);
         res.status(500).json({ error: 'Failed to download the playlist' });
+    }
+});
+
+app.get('/api/download-existing-playlist', (req, res) => {
+    const playlistName = req.query.name;
+    if (!playlistName) return res.status(400).send("No playlist name provided.");
+
+    // Ensure the filename is safe to look up
+    const safeName = playlistName.replace(/[\\/:*?"<>|]/g, '').trim();
+    const m3uPath = path.join('/app/music', `${safeName}.m3u`);
+
+    if (!fs.existsSync(m3uPath)) {
+        return res.status(404).send("Playlist not found on the server.");
+    }
+
+    try {
+        // Read the M3U file to find which MP3s belong to this playlist
+        const m3uContent = fs.readFileSync(m3uPath, 'utf8');
+        const mp3Files = m3uContent.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+
+        // Tell the browser to expect a ZIP download
+        res.attachment(`${safeName}.zip`);
+        
+        const archive = archiver('zip', { zlib: { level: 9 } });
+        archive.on('error', (err) => { throw err; });
+        archive.pipe(res);
+
+        // 1. Add the playlist info file itself to the zip
+        archive.file(m3uPath, { name: `${safeName}.m3u` });
+
+        // 2. Add every MP3 referenced in the playlist to the zip
+        for (const fileName of mp3Files) {
+            const filePath = path.join('/app/music', fileName);
+            if (fs.existsSync(filePath)) {
+                archive.file(filePath, { name: fileName });
+            } else {
+                console.warn(`File missing from server, skipping in zip: ${fileName}`);
+            }
+        }
+
+        // Finalize and send the stream
+        archive.finalize();
+    } catch (error) {
+        console.error("Zipping existing playlist failed:", error);
+        res.status(500).send("An error occurred while zipping the files.");
     }
 });
 

@@ -92,34 +92,52 @@ async function downloadMp3(url) {
         console.error('An error occurred:', error);
     }
 }
+async function downloadSongs(songs, playlistName = null) {
+    const playlistFiles = []; // Track files for the M3U
 
-async function downloadSongs(songs) {
     for (const searchQuery of songs) {
+        const finalName = cleanSongTitle(searchQuery);
+        const fileName = `${finalName}.mp3`;
+        
         if (isSongAlreadyDownloaded(searchQuery)) {
             console.log(`Skipped (already exists): ${searchQuery}`);
+            playlistFiles.push(fileName); // Add to playlist even if skipped
             continue; 
         }
         
-        const finalName = cleanSongTitle(searchQuery);
         const outputPath = path.join(targetFolder, `${finalName}.%(ext)s`);
-        const finalFilePath = path.join(targetFolder, `${finalName}.mp3`);
+        const finalFilePath = path.join(targetFolder, fileName);
 
+        console.log(`Downloading: ${finalName}`);
         try {
             await youtubedl(`ytsearch1:${searchQuery}`, {
                 extractAudio: true,
                 audioFormat: 'mp3',
                 audioQuality: '192K',
-                output: outputPath, 
+                output: outputPath,
                 noWarnings: true,
                 ffmpegLocation: ffmpegPath 
             });
             
-            injectTags(finalName, finalFilePath); // Inject tags here
+            injectTags(finalName, finalFilePath);
+            playlistFiles.push(fileName); // Add to playlist after successful download
             console.log(`Finished: ${finalName}`);
         } catch (error) {
             console.error(`Failed to download ${searchQuery}`);
         }
     }
+    
+    // Create the M3U file if a playlist name was provided
+    if (playlistName && playlistFiles.length > 0) {
+        // Sanitize the playlist name to prevent file system errors
+        const safePlaylistName = playlistName.replace(/[\\/:*?"<>|]/g, '').trim();
+        const m3uPath = path.join(targetFolder, `${safePlaylistName}.m3u`);
+        
+        // Write the filenames separated by newlines
+        fs.writeFileSync(m3uPath, playlistFiles.join('\n'), 'utf8');
+        console.log(`Playlist file created: ${safePlaylistName}.m3u`);
+    }
+
     console.log('All downloads complete!');
 }
 
