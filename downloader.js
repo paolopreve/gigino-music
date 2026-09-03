@@ -40,7 +40,8 @@ function isSongAlreadyDownloaded(searchQuery) {
     return false;
 }
 // Add playlistName as the third parameter
-function injectTags(finalName, outputPath, playlistName) {
+// Add an optional 'playlistCreator' parameter (defaults to "Gigino")
+function injectTags(finalName, outputPath, playlistName, playlistCreator = "gigino-music") {
     let tags = {};
     const splitIndex = finalName.indexOf(' - ');
     
@@ -49,15 +50,18 @@ function injectTags(finalName, outputPath, playlistName) {
         tags.title = finalName.substring(splitIndex + 3).trim();
     } else {
         tags.title = finalName.trim();
-        tags.artist = "Unknown Artist"; // Good fallback for YouTube Music
+        tags.artist = "Unknown Artist"; 
     }
     
-    // TRICK YOUTUBE MUSIC: Force the Album tag to be the Playlist Name!
-    // If it's a single song, default to "Gigino Downloads"
+    // Set the Album name (Playlist name)
     tags.album = playlistName ? playlistName : "Gigino Downloads";
     
+    // TRICK PLAYERS WITH WHO MADE IT: 
+    // 'performerInfo' writes to the Album Artist (TPE2) tag field
+    tags.performerInfo = playlistCreator; 
+    
     NodeID3.write(tags, outputPath);
-    console.log(`Injected Tags -> Artist: "${tags.artist}", Album: "${tags.album}", Title: "${tags.title}"`);
+    console.log(`Injected Tags -> Artist: "${tags.artist}", Album: "${tags.album}", Album Artist: "${tags.performerInfo}", Title: "${tags.title}"`);
 }
 
 async function downloadMp3(url) {
