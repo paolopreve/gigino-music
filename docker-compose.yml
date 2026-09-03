@@ -16,6 +16,4 @@ services:
       - "3000:3000"
     volumes:
       - ./music:/app/music
-    env_file:
-      - .env
     restart: unless-stopped
